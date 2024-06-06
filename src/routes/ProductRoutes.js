@@ -1,37 +1,21 @@
 const express = require("express")
 const router = express.Router();
 const Product = require("../models/Product.js")
-const { createProduct,s, showProducts } = require("../controllers/productController.js")
+const { createProduct, showProducts } = require("../controllers/productController.js")
 // const producto = [{nombre:"Yes",descripcion:"Vamos", Categoria:"Zapatos",Talla:"S",Precio:"5"}]
 const multer = require("multer")
 const upload = multer({ dest: "public/images/" })
 
 // POST /dashboard: Crea un nuevo producto.
 
-router.post("/dashboard", upload.single("imagen"), async (req, res) => {
-    console.log(req.file)
-    createProduct(req.body)
-    console.log(req.body)
-    res.redirect("/dashboard")
+router.post("/dashboard", upload.single("imagen"),createProduct)
+    
 
-})
-// GET /products: Devuelve todos los productos. Cada producto tendrá un enlace a su página de detalle.
+//GET /products: Devuelve todos los productos. Cada producto tendrá un enlace a su página de detalle.
 
 // router.get("/products",showProducts)
-router.get("/products", async (req, res) => {
-    try {
-        const products = await Product.find()
-        res.status(201).send(`<h1>Lista de productos</h1>
-         ${products.map((el) => `<ul><li><a href ="/products/${el._id}">${el.Nombre}</a>
-         </li>
 
-        </ul>`)}
-    `)
-    }
-    catch {
-        res.status(500).send({ message: "There was a problem to trying to get the products" })
-    }
-})
+router.get("/products", showProducts)
 
 //GET /products/:productId: Devuelve el detalle de un producto.
 
@@ -177,7 +161,7 @@ router.get("/dashboard/:productId/edit", async (req, res) => {
         </head>
         <body>
         <h1>Formulario para editar un producto</h1>
-            <form action="/dashboards" method="_post" value="PUT">
+            <form action="/dashboards" method="post" id="form">
                 <p><label for="nombre">Nombre:</label>
                 <input type="text" id="nombre" name="nombre" required></p>
   
@@ -197,6 +181,7 @@ router.get("/dashboard/:productId/edit", async (req, res) => {
                 <input type="text" id="Precio" name="Precio" required></p>
                 <p><button type="submit">Editar</button></p>
             </form>
+
         </body>
         </html>`)
 

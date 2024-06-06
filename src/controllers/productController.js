@@ -1,11 +1,12 @@
 const Product = require("../models/Product.js")
-const createProduct = async (productDetails) => {
-	try{const createProduct =await Product.create(productDetails)
-		return createProduct}
+const createProduct = async (req,res) => {
+	try{const createProduct =await Product.create(req.body)
+
+		res.status(201).send(createProduct).redirect("/dashboard") }
 		
 		catch(error){
 			console.log(error);
-			console.log("No se pudo crear el Producto revisa el modelo")
+			res.status(500).send("No se pudo crear el Producto revisa el modelo")
 			
 		}
 		
@@ -68,11 +69,20 @@ const baseHtml = `<!DOCTYPE html>
 </body>
 </html>`
 const showProducts = async (req, res) => {
-	const products = await Product.find();
-	const productCards = getProductCards(products);
-	const html = baseHtml + getNavBar() + productCards;
-	res.send(html);
-  };
+    try {
+        const products = await Product.find()
+        res.status(201).send(`<h1>Lista de productos</h1>
+         ${products.map((el) => `<ul><li><a href ="/products/${el._id}">${el.Nombre}</a>
+         </li>
+         
+
+        </ul>`)}
+    `)
+    }
+    catch {
+        res.status(500).send({ message: "There was a problem to trying to get the products" })
+    }
+};
 	  
 
 	function getProductCards(products) {
