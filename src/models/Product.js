@@ -8,8 +8,7 @@ const ProductSchema = new mongoose.Schema({
    Talla:{type:String,enum:["XS","S","M","L","XL"]},
    Precio: {type:String,required:true} 
 })
-const Product = mongoose.model("Product",ProductSchema
-)
+const Product = mongoose.model("Product",ProductSchema)
 
 
 module.exports = Product

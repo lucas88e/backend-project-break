@@ -1,103 +1,267 @@
 const Product = require("../models/Product.js")
-const createProduct = async (req,res) => {
-	try{const createProduct =await Product.create(req.body)
 
-		res.status(201).send(createProduct).redirect("/dashboard") }
-		
-		catch(error){
-			console.log(error);
-			res.status(500).send("No se pudo crear el Producto revisa el modelo")
-			
-		}
-		
-	};
-	
+const createProduct = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).send("Imagen no proporcionada");
+        }
 
-	// const productDetails = {Nombre: "Zapoatos",
-	// Descripcion: "Publicado",
-	// Categoria: ["Zapatos"],
-	// Talla: "X"}
-	// createProduct(productDetails)
+        const imagePath = `/images/${req.file.filename}.png`;
+        const productData = {
+            ...req.body,
+            Imagen: imagePath 
+        };
 
-	// const showProducts = async() =>{
-	// 	try {
-	// 		const products = await Product.find()
-	// 		res.status(201).send(`<h1>Lista de productos</h1>
-	// 		 ${products.map((el) => `<ul><li><a href ="/products/${el._id}">${el.Nombre}</a>
-	// 		 </li>
-	
-	// 		</ul>`)}
-	// 	`)
-	// 	}
-	// 	catch {
-	// 		res.status(500).send({ message: "There was a problem to trying to get the products" })
-	// 	}
-
-	// }
-function getNavBar(){const html = `<nav class="navbar navbar-expand-lg bg-body-tertiary">
-<div class="container-fluid">
-  <a class="navbar-brand" href="#">Navbar</a>
-  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-	<span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-	<div class="navbar-nav">
-	  <a class="nav-link active" aria-current="page" href="#">Home</a>
-	  <a class="nav-link" href="#">Features</a>
-	  <a class="nav-link" href="#">Pricing</a>
-	  <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-	</div>
-  </div>
-</div>
-</nav>`
-return html
-
-}
-const baseHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Formulario Producto</title>
-	<link
-	rel = "stylesheet" 
-	href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
-</head>
-<body>
-<script src = https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js>
-</script>
-</body>
-</html>`
-const showProducts = async (req, res) => {
+        const createProduct = await Product.create(productData);
+        res.status(201).send(createProduct);
+        console.log(createProduct);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("No se pudo crear el Producto, revisa el modelo");
+    }
+};
+const showProductss = async (req, res) => {
     try {
         const products = await Product.find()
         res.status(201).send(`<h1>Lista de productos</h1>
          ${products.map((el) => `<ul><li><a href ="/products/${el._id}">${el.Nombre}</a>
          </li>
-         
-
-        </ul>`)}
-    `)
+         <b>Imagen:</b><img src="${el.Imagen}"/>
+        </ul>`)
+    
     }
+    `)
+    console.log(products)}
     catch {
         res.status(500).send({ message: "There was a problem to trying to get the products" })
     }
 };
-	  
+const showNewProduct = async (req, res) => {
+    try {
+        res.status(200).send(`<!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Formulario Producto</title>
+      </head>
+      <body>
+      <h1>Formulario para crear un producto</h1>
+          <form action="/dashboard" method="POST" enctype="multipart/form-data">
+              <p><label for="Nombre">Nombre:</label>
+              <input type="text" id="Nombre" name="Nombre" required></p>
 
-	function getProductCards(products) {
-		let html = '';
-		for (let product of products) {
-		  html += `
-			<div class="product-card">
-			  <img src="${product.image}" alt="${product.name}">
-			  <h2>${product.name}</h2>
-			  <p>${product.description}</p>
-			  <p>${product.price}€</p>
-			  <a href="/products/${product._id}">Ver detalle</a>
-			</div>
-		  `;
-		}
-		return html;
-	  }
-    module.exports = {createProduct,showProducts}
+              <p><label for="Descripcion">Descripcion:</label>
+              <input type="text" id="Descripcion" name="Descripcion" required></p>
+              
+             <p> <label for="imagen">Imagen:</label>
+              <input type="file" id="imagen" name="imagen"></p>
+
+              <p><label for="Categoria">Categoria:</label>
+              <input type="text" id="Categoria" name="Categoria" required></p>
+
+              <p><label for="Talla">Talla:</label>
+              <input type="text" id="Talla" name="Talla" required></p>
+
+              <p><label for="Precio">Precio:</label>
+              <input type="text" id="Precio" name="Precio" required></p>
+              <p><button type="submit">Enviar</button></p>
+          </form>
+      </body>
+      </html>`)
+    }
+    catch {
+        res.status(500).send({ message: "There was a problem to trying to get the products" })
+    }
+}
+
+const showEditProduct = async (req, res) => {
+    try {
+        const productId = await Product.findById(req.params.productId);
+        if (!productId) {
+            return res.status(404).send({ message: "Product not found" });
+        }
+
+        res.status(200).send(`<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Formulario Producto</title>
+        </head>
+        <body>
+        <h1>Formulario para editar un producto</h1>
+            <form action="/dashboard/${productId._id}?_method="PUT" method="PUT" id="form">
+                <p><label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required></p>
+  
+                <p><label for="Descripcion">Descripcion:</label>
+                <input type="text" id="Descripcion" name="Descripcion" required></p>
+                
+               <p> <label for="imagen">Imagen:</label>
+                <input type="img" id="imagen" name="imagen"></p>
+  
+                <p><label for="Categoria">Categoria:</label>
+                <input type="text" id="Categoria" name="Categoria" required></p>
+  
+                <p><label for="Talla">Talla:</label>
+                <input type="text" id="Talla" name="Talla" required></p>
+  
+                <p><label for="Precio">Precio:</label>
+                <input type="text" id="Precio" name="Precio" required></p>
+                <p><button type="submit">Editar</button></p>
+            </form>
+        </body>
+        </html>`)
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "There was a problem trying to update the product" });
+    }
+}
+
+const deleteProduct = async (req, res) => {
+    try {
+        const id = req.params.productId
+        const deleteProduct = await Product.findByIdAndDelete(id)
+        if (!deleteProduct) {
+            return res.json({ error: "Product  not found" })
+        }
+        res.status(200).send(`${deleteProduct} deleted successfully`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "There was a problem trying to delete the post" });
+    }
+}
+const updateProduct = async (req, res) => {
+    try {
+        const id = req.params.productId
+        const updateProduct = await Product.findByIdAndUpdate(id, req.body,
+            { new: true }
+        )
+        if (!updateProduct) {
+            return res.json({ error: "Product  not found" })
+        }
+        console.log(updateProduct)
+        res.status(200).send(`${updateProduct} update successfully`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "There was a problem trying to update the product" });
+    }
+}
+const dashboardProduct = async (req, res) => {
+    try {
+        const productId = await Product.findById(req.params.productId);
+        if (!productId) {
+            return res.status(404).send({ message: "Product not found" });
+        }
+
+        res.status(200).send(`<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Formulario Producto</title>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+            </head>
+            <body>
+                <h1>Sesion de administrador</h1>
+                <h2> ${productId.Nombre} es el articulo seleccionado</h2>
+                <ul>
+                    <p><li> <b>Nombre:</b> ${productId.Nombre}</li></p>
+                    <p><li> <b>Descripción:</b> ${productId.Descripcion}</li></p>
+                    <p><li> <b>Id:</b> ${productId._id}</li></p>
+                    <p><li> <b>Categoria:</b> ${productId.Categoria}</li></p>
+                    <p><li> <b>Talla:</b> ${productId.Talla}</li></p>
+                    <p><li> <b>Precio:</b> ${productId.Precio}</li></p>
+                     <p><li> <b>Imagen:</b><img src="${productId.Imagen}"/></li></p>
+
+
+                </ul>
+                <a href="/dashboard/${productId._id}/edit" class="btn btn-primary">Modificar</a>
+                <button onClick="deleteProduct()" id="btnDelete" class="btn btn-danger">Eliminar</button>
+                <script>
+                    async function deleteProduct() {
+                        try {
+                            const response = await fetch('/dashboard/${productId._id}/delete', {
+                                method: 'DELETE',
+                               
+                            });
+                            if (response.ok) {
+                                alert('Producto eliminado exitosamente');
+                                window.location.href = '/dashboard';
+                            } else {
+                                alert('Error al eliminar el producto');
+                            }
+                        } catch (error) {
+                            console.error('Error al eliminar el producto:', error);
+                            alert('Error al eliminar el producto');
+                        }
+                    }
+                </script>
+            </body>
+            </html>`);
+
+            console.log(productId.Imagen)
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "There was a problem trying to get the product" });
+    }
+}
+const dashboard = async (req, res) => {
+    try {
+        const products = await Product.find()
+        res.status(201).send(`<h1>Lista de productos</h1>
+        ${products.map((el) => `<ul><li>${el.Nombre}
+        </li>
+        <li>${el.Descripcion}</li>
+        <li>${el.Categoria}</li>
+        <li>${el.Talla}</li>
+        <li>${el.Precio}</li>
+        <li><img src="${el.Imagen}"/></li>
+        <a href ="/dashboard/${el._id}"> Gestionar como administrador</a>
+
+       </ul>`)}
+   `)
+    }
+    catch {
+        res.status(500).send({ message: "There was a problem to trying to get the products" })
+    }
+}
+const productsId = async (req, res) => {
+    try {
+        const productId = await Product.findById(req.params.productId);
+        if (!productId) {
+            return res.status(404).send({ message: "Product not found" });
+        }
+        res.status(200).send(`<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Formulario Producto</title>
+            <link
+            rel = "stylesheet" 
+            href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+        </head>
+        <body>
+          <h1>Sesion Iniciada</h1>
+        <h2> ${productId.Nombre} es el articulo selecionado</h2>
+        <ul>
+        <p><li> <b>Nombre:</b> ${productId.Nombre}</li></p>
+        <p><li> <b>Descripción:</b> ${productId.Descripcion}</li></p>
+        <p><li> <b>Categoria:</b> ${productId.Categoria}</li></p>
+        <p><li> <b>Talla:</b> ${productId.Talla}</li></p>
+        <p><li> <b>Precio:</b> ${productId.Precio}</li></p>
+        <li><b>Imagen:</b><img src="${productId.Imagen}"/></li>
+        </ul>
+        
+        </body>
+        </html>`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "There was a problem trying to get the post" });
+    }
+}
+module.exports = { dashboard, productsId, createProduct, showProductss, showNewProduct, deleteProduct, showEditProduct, dashboardProduct, updateProduct }
