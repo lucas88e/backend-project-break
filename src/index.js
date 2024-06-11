@@ -1,4 +1,3 @@
-
 const express = require('express')
 const app = express()
 const port = 3005 || process.env.PORT
@@ -11,15 +10,15 @@ const methodOverride = require("method-override")
 const path = require('path');
 const hashedSecret = require("./config/crypto.js")
 
+
 app.use(session({
-  secret:hashedSecret,
+  secret:process.env.jwtPrivateKey,
   resave:false,
   saveUninitialized:true,
-  cookie:{secrure:true}
+  cookie:{secure:true}
 }))
 
 
-app.use("/", require("./routes/authRoutes.js"))
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -27,8 +26,9 @@ app.use("/",router)
 app.use(helmet())
 app.use(compression())
 app.use(methodOverride('_method'));
+app.use("/", require("./routes/authRoutes.js"))
 
-app.use('/images', express.static(path.join(__dirname, '..','public','images')))
+app.use( express.static(path.join(__dirname, '..','public')))
 
 
 dbConnection()

@@ -1,8 +1,20 @@
 const express = require("express")
 const router = express.Router();
 // const users= require("../Usuarios/data.js")
-// const usersDB  ={}
+const usersDB  ={}
 // const bcrypt = require("bcrypt")
+const {register} = require("../controllers/productController")
+const auth = require("../middelware/auth")
+const User= require("../models/user.js")
+const bcrypt = require("bcrypt")
+const jwt = require('jsonwebtoken')
+
+
+// router.post("/ee", async (req, res) => {
+//     console.log(req.body)
+//     res.send("fe")
+// })
+
 
 router.get("/sesion", (req, res) => {
     
@@ -26,41 +38,110 @@ router.get("/sesion", (req, res) => {
 res.send(login)}
 })
 
-// router.post("/login",(req,res)=>{
-//     const {username,password}= req.body
-//     const user = users.find((user)=> user.username ===username && user.password ===password) //Find siempre determina true o false
-//     if(user){
-//         const token = middelware.generateToken(user)
-//         req.session.token = token
-//         res.redirect("/dashboard")
-//     }else{
-//         res.status(401).json({mensaje:"No se ha encontrado el token"})
-//     }
-   
+router.post(
+	'/login',
 
-// })
+	async (req, res) => {
+		const { username, password: passwordPlainText } = req.body
 
+		const user = await User.findOne({ username })
 
+		if (!user)
+			return res.status(400).send('Usuario o contraseña invalido')
 
-// router.get("/login")
+		const isAuth = await bcrypt.compare(
+			passwordPlainText,
+			user.password
+		)
 
-// router.post("/register",async(req,res)=>{
-//     const {username,password:passwordPlainText} = req.body;
-//     if(!usersDB[username])
-// return res.status(400).send("Usuario o contraseña no válido")
-//     const isAuth = await bcrypt.compare(passwordPlainText, usersDB[username.password])
-//     if(!isAuth)
-//         return res.status(400).send("Usuario o contraseña no válido")
-
-//     res.send("BRAVO")
-// })
-
-// router.post('/hola', (req, res) => {
-//     console.log('Parsed Body:',req.body); // Debería mostrar el cuerpo de la solicitud analizado
-//     res.send('Gracias');
-// });
+		if (!isAuth)
+			return res.status(400).send('Usuario o contraseña invalido')
+        const token = user.generateJWT()
+		req.session.token = token
 
 
-// router.get("/logout")
+		// const token = await user.generateJWT()
+
+		res.setHeader('x-auth-token', token)
+		res.send('Bravo')
+	}
+)
+router.get("/registro",register)
+           
+router.post(
+	'/register',
+	async (req, res) => {
+		const {
+			username,
+			password: passwordPlainText,
+			isAdmin,
+			...rest
+		} = req.body
+
+		const user = await User.findOne({ username })
+
+		if (user)
+			return res.status(400).send('Usuario o contraseña invalido')
+
+		const salt = await bcrypt.genSalt(10)
+		const password = await bcrypt.hash(passwordPlainText, salt)
+
+		const newUser = await User.create({ username, password, ...rest })
+
+		const token = newUser.generateJWT()
+        console.log(token)
+
+		res.setHeader('x-auth-token', token)
+
+		res.send("Registrado")
+	}
+)
+router.get('/profile', auth, (req, res) => {
+	console.log(req.user)
+
+	res.send('BRAVOOO')
+})
+router.post("/logout",(req,res)=>{
+	req.session.destroy();
+	res.send("Sesion destruida")
+	
+	})
+
+
+
 
 module.exports = router
+
+// router.post("/login", async (req, res) => {
+//     const { username, password: passwordPlainText } = req.body
+//     if (!usersDB[username])
+//         return res.status(400).send("Usuario o contraseña no valido")
+//     const isAuth = await bcrypt.compare(passwordPlainText,
+//         usersDB[username].password)
+//     if (!isAuth)
+//         return res.status(400).send("Usuario o contraseña no valido")
+
+//     const token = await generateJWT({ username })
+
+// 	res.setHeader('x-auth-token', token)
+//     res.send("Bravo")
+// }
+
+// )
+// router.get("/registro",register)
+
+// router.post("/register", async (req, res) => {
+
+//     const { username, password: passwordPlainText } = req.body;
+//     if (usersDB[username])
+//         return res.status(400).send("Usuario o contraseña no válido")
+//     const salt = await bcrypt.genSalt(10)
+//     const password = await bcrypt.hash(passwordPlainText, salt)
+//     usersDB[username] = { username, password }
+//     const token = await generateJWT({ username })
+
+// 	res.setHeader('x-auth-token', token)
+//     console.log(usersDB)
+//     res.send(`<h1>Registrado con éxito</h1><p>
+//         <a href ="/sesion">Login</a></p> `)
+// })

@@ -1,32 +1,39 @@
 const express = require("express")
 const router = express.Router();
-const { createProduct,register, showEditProduct, deleteProduct, updateProduct, dashboardProduct, } = require("../controllers/productController.js")
+const { createProduct, deleteProduct,updateProduct,categorias} = require("../controllers/productController.js")
 const multer = require("multer")
 const upload = multer({ dest: "public/images/" })
-const { showProductss,showNewProductss,showEditProductss,dashboardProducts,productsId,dashboard } = require("../controllers/esstructura.js")
-const usersDB = {}
-const bcrypt = require("bcrypt")
+const { showNewProducts,showZapatos,showEditProducts,categori,getnav,showCamiseta,dashboardProducts,showProducts,productsId,dashboard } = require("../controllers/esstructura.js")
 const auth = require("../middelware/auth")
-const  getNavBar  = require("../controllers/esstructura.js");
-
-const jwt = require('jsonwebtoken')
-async function generateJWT(payload) {
-	return await jwt.sign(payload, 'cocacola')
-}
+const admin = require("../middelware/admin")
+const Product = require("../models/Product.js");
+require('express-async-errors')
 
 
+// async function generateJWT() {
+// 	return await jwt.sign( process.env.jwtPrivateKey)
+// }
+
+// router.post("/ee", async (req, res) => {
+//     console.log(req.body)
+//     res.send("fe")
+// })
+router.get("/productos/:categorias",categorias)
 
 
 // POST /dashboard: Crea un nuevo producto.
 // router.get("/", showProducts)
 router.post("/dashboard", upload.single("imagen"), createProduct)
 //GET /products: Devuelve todos los productos. Cada producto tendrá un enlace a su página de detalle.
-router.get("/products", showProductss)
+router.get("/products", auth,showProducts)
+
 
 //GET /products/:productId: Devuelve el detalle de un producto.
 
 router.get("/products/:productId", productsId);
 //PUT /dashboard/:productId: Actualiza un producto.
+router.get("/camisetas",showCamiseta)
+router.get("/zapatos",showZapatos)
 
 router.put("/dashboard/:productId", updateProduct);
 
@@ -39,55 +46,21 @@ router.delete("/dashboard/:productId/delete", deleteProduct)
 // Si clickamos en uno de ellos nos llevará a su página para poder actualizarlo o eliminarlo.
 
 
-router.get("/dashboard", dashboard)
+router.get("/dashboard",auth, dashboard)
 
 //GET /dashboard/new: Devuelve el formulario para subir un artículo nuevo.
-router.get("/dashboard/new", showNewProductss)
-//GET /dashboard/:productId: Devuelve el detalle de un producto en el dashboard.
+router.get("/dashboard/new", showNewProducts)
+//GET /dashboard/:productId: Devue lve el detalle de un producto en el dashboard.
 router.get("/dashboard/:productId", dashboardProducts);
 
 //GET /dashboard/:productId/edit: Devuelve el formulario para editar un producto.
 
-router.get("/dashboard/:productId/edit", showEditProductss);
+router.get("/dashboard/:productId/edit", showEditProducts);
 
 
 
 
 // Rutas AUTH LOGIN REGISTER LOGOUT
-
-
-router.post("/login", async (req, res) => {
-    const { username, password: passwordPlainText } = req.body
-    if (!usersDB[username])
-        return res.status(400).send("Usuario o contraseña no valido")
-    const isAuth = await bcrypt.compare(passwordPlainText,
-        usersDB[username].password)
-    if (!isAuth)
-        return res.status(400).send("Usuario o contraseña no valido")
-
-    const token = await generateJWT({ username })
-
-	res.setHeader('x-auth-token', token)
-    res.redirect("/products")
-}
-
-)
-router.get("/registro",register)
-
-router.post("/register", async (req, res) => {
-
-    const { username, password: passwordPlainText } = req.body;
-    if (usersDB[username])
-        return res.status(400).send("Usuario o contraseña no válido")
-    const salt = await bcrypt.genSalt(10)
-    const password = await bcrypt.hash(passwordPlainText, salt)
-    usersDB[username] = { username, password }
-    const token = await generateJWT({ username })
-
-	res.setHeader('x-auth-token', token)
-    console.log(usersDB)
-    res.redirect("/sesion")
-})
 
 
 

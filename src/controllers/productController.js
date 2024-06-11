@@ -1,4 +1,7 @@
 const Product = require("../models/Product.js");
+const {getNavBar,baseHtml,endHtml} = require("./esstructura.js")
+
+
 const createProduct = async (req, res) => {
     try {
         if (!req.file) {
@@ -21,7 +24,7 @@ const createProduct = async (req, res) => {
 };
 
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res,next) => {
     try {
         const id = req.params.productId
         const deleteProduct = await Product.findByIdAndDelete(id)
@@ -30,11 +33,12 @@ const deleteProduct = async (req, res) => {
         }
         res.status(200).send(`${deleteProduct} deleted successfully`);
     } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: "There was a problem trying to delete the post" });
+        // console.error(error);
+        // res.status(500).send({ message: "There was a problem trying to delete the post" });
+        next()
     }
 }
-const updateProduct = async (req, res) => {
+const updateProduct = async (req, res,next) => {
     try {
         const id = req.params.productId
         const updateProduct = await Product.findByIdAndUpdate(id, req.body,
@@ -46,11 +50,9 @@ const updateProduct = async (req, res) => {
         console.log(updateProduct)
         res.status(200).send(`${updateProduct} update successfully`);
     } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: "There was a problem trying to update the product" });
+        next();
     }
 }
-
 
 
 
@@ -66,9 +68,26 @@ const register = async (req, res) => {
         <p><button type="submit">Registrarse</button></p>
         </form> `)
 }
+const categorias = async (req,res)=>{
+	const categorias = req.params.categorias
+	const categoriasArray = categorias.split(',');
 
-module.exports = { register, createProduct, deleteProduct, updateProduct }
+	const todasCategorias = await Product.find({ Categoria: categoriasArray }) 
 
+
+	res.status(201).send(`${baseHtml}<h1>Lista de productos</h1>
+    ${getNavBar()}
+                 ${todasCategorias.map((el) => `<ul><li>${el.Nombre}
+                </li>
+                 <li>${el.Descripcion}</li>
+                 <li>${el.Categoria}</li>
+                 <li>${el.Talla}</li>
+                 <li>${el.Precio}</li>
+                <li><img src="${el.Imagen}"/></li>
+               </ul>`)}
+            ${endHtml}`)
+
+}
 
 // const showProductss = async (req, res) => {
 //     try {
@@ -87,6 +106,9 @@ module.exports = { register, createProduct, deleteProduct, updateProduct }
 //         res.status(500).send({ message: "There was a problem to trying to get the products" })
 //     }
 // };
+module.exports = { register, createProduct, deleteProduct,categorias, updateProduct }
+
+
 
 
 // const showEditProduct = async (req, res) => {

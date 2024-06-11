@@ -11,7 +11,7 @@ module.exports = async function (req, res, next) {
 	console.log(token)
 
 	try {
-		const decoded = await jwt.verify(token, 'cocacola')
+		const decoded = await jwt.verify(token, process.env.jwtPrivateKey)
 
 		req.user = decoded
 
