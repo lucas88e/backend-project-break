@@ -1,7 +1,6 @@
 const Product = require("../models/Product.js")
-const {categorias} = require("./productController.js")
 function getNavBar() {
-  const html = `<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  const html = `<nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="/products">Productos</a>
   
@@ -14,6 +13,8 @@ function getNavBar() {
       <a class="nav-link active" aria-current="page" href="/productos/Zapatos">Zapatos</a>
       <a class="nav-link active" aria-current="page" href="/productos/pantalones">Pantalones</a>
       <a class="nav-link active" aria-current="page" href="/productos/accesorios">Accesorios</a>
+      <a class="nav-link active" aria-current="page" href="/dashboard/new">Nuevo Producto</a>
+
       <a class="nav-link active" aria-current="page" href="/sesion">Login</a>
   
     </div>
@@ -22,6 +23,7 @@ function getNavBar() {
   </nav>`
   return html
 }
+
 const baseHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,6 +33,8 @@ const baseHtml = `<!DOCTYPE html>
 	<link
 	rel = "stylesheet" 
 	href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  
 </head>
 <body>
 
@@ -183,7 +187,7 @@ function dashboardProduct(products) {
                     <p><li> <b>Categoria:</b> ${product.Categoria}</li></p>
                     <p><li> <b>Talla:</b> ${product.Talla}</li></p>
                     <p><li> <b>Precio:</b> ${product.Precio}</li></p>
-                     <p><li> <b>Imagen:</b><img src="${product.Imagen}"/></li></p>
+                     <p><li> <b>Imagen:</b><img src="${product.Imagen}" class="card-img-top"/></li></p>
 
 
                 </ul>
@@ -279,14 +283,19 @@ function dashboards(products) {
 function showProduct(products) {
   try {
     let html = `<h1>Lista de productos</h1>
-            <h2> Sesion iniciada </h2>`;
+            <h2> Sesion iniciada </h2>
+            <div class="card-group">`;
     for (let product of products) {
       html +=
-        `
-         <ul><li><a href ="/products/${product._id}">${product.Nombre}</a>
-         </li>
-         <b>Imagen:</b><img src="${product.Imagen}"/>
-        </ul>`
+
+      `<div class="card" style="width: 10rem;">
+      <img src="${product.Imagen}"class="card-img-top" alt="${product.Nombre}"/>
+      <div class="card-body">
+        <h5 class="card-title">${product.Nombre}</h5>
+        <p class="card-text">${product.Descripcion}</p>
+        <a href ="/products/${product._id}" class="btn btn-primary">Mas información</a>
+      </div>
+    </div>`
 
         ; 
     }return html
@@ -295,7 +304,10 @@ function showProduct(products) {
     console.error(error);
   }
 }
-
+{/* <ul><li><a href ="/products/${product._id}">${product.Nombre}</a>
+</li>
+<b>Imagen:</b><img src="${product.Imagen}"class="card-img-bottom" alt="${product.Nombre}"/>
+</ul> */}
 
 
 
@@ -336,32 +348,20 @@ const dashboard = async (req, res) => {
 const showProducts = async (req, res) => {
   const products = await Product.find();
   const productCards = showProduct(products);
-  const html = baseHtml + getNavBar() + productCards+endHtml;
-  res.send(html);
-};
-const showCamiseta = async (req, res) => {
-  const camisetas = await Product.find({ Categoria: "Camisetas" })
-    const productCards = showProduct(camisetas);
-  const html = baseHtml + getNavBar() + productCards+endHtml;
-  res.send(html);
-};
-const showZapatos= async (req, res) => {
-  const zapatos = await Product.find({ Categoria: "Zapatos" })
-    const productCards = showProduct(zapatos);
-  const html = baseHtml + getNavBar() + productCards+endHtml;
-  res.send(html);
-};
-const categori = async (req, res) => {
-  const categorias = req.params.categorias
-	const categoriasArray = categorias.split(',');
-	const todasCategorias = await Product.find({ Categoria: categoriasArray })
-  const productCards = showProducts(todasCategorias);
-  const html = baseHtml + getNavBar() + productCards+endHtml;
+  const html = baseHtml + getNavBar()+productCards +endHtml;
   res.send(html);
 };
 
 
-module.exports = { showCamiseta,getNavBar,baseHtml,endHtml,showZapatos,showProducts,showEditProducts,dashboard, productsId, dashboardProducts, showNewProducts, showEditProducts }
+
+
+module.exports = { getNavBar,baseHtml,endHtml,showProducts,showEditProducts,dashboard, productsId, dashboardProducts, showNewProducts, showEditProducts }
+  // const showCamiseta = async (req, res) => {
+  //   const camisetas = await Product.find({ Categoria: "Camisetas" })
+  //     const productCards = showProduct(camisetas);
+  //   const html = baseHtml + getNavBar() + productCards+endHtml;
+  //   res.send(html);
+  // };
 
 // const showProducts = async (req, res) => {
 //   //   const products = await Product.find();
