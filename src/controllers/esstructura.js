@@ -34,9 +34,11 @@ const baseHtml = `<!DOCTYPE html>
 	rel = "stylesheet" 
 	href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="/styles.css"/>
-  
+
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
 `
 const endHtml = `</body></html>`
