@@ -75,9 +75,10 @@ const categorias = async (req,res)=>{
 	const todasCategorias = await Product.find({ Categoria: categoriasArray }) 
 
 
-	res.status(201).send(`${baseHtml}<h1>Lista de productos</h1>
+	res.status(201).send(`${baseHtml}
     ${getNavBar()}
-                 ${todasCategorias.map((el) => `<ul><li>${el.Nombre}
+                 ${todasCategorias.map((el) => `<h1>Lista de productos</h1>
+                    <ul><li>${el.Nombre}
                 </li>
                  <li>${el.Descripcion}</li>
                  <li>${el.Categoria}</li>
@@ -88,6 +89,86 @@ const categorias = async (req,res)=>{
             ${endHtml}`)
 
 }
+
+
+const productsId = async (req, res) => {
+    try {
+        const productId = await Product.findById(req.params.productId);
+        if (!productId) {
+            return res.status(404).send({ message: "Product not found" });
+        }
+        res.status(200).send(`${baseHtml}${getNavBar()}
+          <h1>Sesion Iniciada</h1>
+        <h2> ${productId.Nombre} es el articulo selecionado</h2>
+        <ul>
+        <p><li> <b>Nombre:</b> ${productId.Nombre}</li></p>
+        <p><li> <b>Descripción:</b> ${productId.Descripcion}</li></p>
+        <p><li> <b>Categoria:</b> ${productId.Categoria}</li></p>
+        <p><li> <b>Talla:</b> ${productId.Talla}</li></p>
+        <p><li> <b>Precio:</b> ${productId.Precio}</li></p>
+        <li><b>Imagen:</b><img src="${productId.Imagen}"/></li>
+        </ul>
+        
+       ${endHtml}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "There was a problem trying to get the post" });
+    }
+}
+const dashboardProduct = async (req, res) => {
+    try {
+        const productId = await Product.findById(req.params.productId);
+        if (!productId) {
+            return res.status(404).send({ message: "Product not found" });
+        }
+
+        res.status(200).send(`${baseHtml}${getNavBar()}
+                <h1>Sesion de administrador</h1>
+                <h2> ${productId.Nombre} es el articulo seleccionado</h2>
+                <ul>
+                    <p><li> <b>Nombre:</b> ${productId.Nombre}</li></p>
+                    <p><li> <b>Descripción:</b> ${productId.Descripcion}</li></p>
+                    <p><li> <b>Id:</b> ${productId._id}</li></p>
+                    <p><li> <b>Categoria:</b> ${productId.Categoria}</li></p>
+                    <p><li> <b>Talla:</b> ${productId.Talla}</li></p>
+                    <p><li> <b>Precio:</b> ${productId.Precio}</li></p>
+                     <p><li> <b>Imagen:</b><img src="${productId.Imagen}"/></li></p>
+                </ul>
+                <a href="/dashboard/${productId._id}/edit" class="btn btn-primary">Modificar</a>
+                <button onClick="deleteProduct()" id="btnDelete" class="btn btn-danger">Eliminar</button>
+                <script>
+                    async function deleteProduct() {
+                        try {
+                            const response = await fetch('/dashboard/${productId._id}/delete', {
+                                method: 'DELETE',
+                               
+                            });
+                            if (response.ok) {
+                                alert('Producto eliminado exitosamente');
+                                window.location.href = '/dashboard';
+                            } else {
+                                alert('Error al eliminar el producto');
+                            }
+                        } catch (error) {
+                            console.error('Error al eliminar el producto:', error);
+                            alert('Error al eliminar el producto');
+                        }
+                    }
+                </script>
+           ${endHtml}`);
+
+            console.log(productId.Imagen)
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "There was a problem trying to get the product" });
+    }
+}
+
+
+module.exports = { register, createProduct,dashboardProduct, deleteProduct,categorias, productsId,updateProduct }
+
+
 
 // const showProductss = async (req, res) => {
 //     try {
@@ -106,11 +187,6 @@ const categorias = async (req,res)=>{
 //         res.status(500).send({ message: "There was a problem to trying to get the products" })
 //     }
 // };
-module.exports = { register, createProduct, deleteProduct,categorias, updateProduct }
-
-
-
-
 // const showEditProduct = async (req, res) => {
 //     try {
 //         const productId = await Product.findById(req.params.productId);
@@ -173,40 +249,5 @@ module.exports = { register, createProduct, deleteProduct,categorias, updateProd
 //     }
 //     catch {
 //         res.status(500).send({ message: "There was a problem to trying to get the products" })
-//     }
-// }
-// const productsId = async (req, res) => {
-//     try {
-//         const productId = await Product.findById(req.params.productId);
-//         if (!productId) {
-//             return res.status(404).send({ message: "Product not found" });
-//         }
-//         res.status(200).send(`<!DOCTYPE html>
-//         <html lang="en">
-//         <head>
-//             <meta charset="UTF-8">
-//             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//             <title>Formulario Producto</title>
-//             <link
-//             rel = "stylesheet" 
-//             href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
-//         </head>
-//         <body>
-//           <h1>Sesion Iniciada</h1>
-//         <h2> ${productId.Nombre} es el articulo selecionado</h2>
-//         <ul>
-//         <p><li> <b>Nombre:</b> ${productId.Nombre}</li></p>
-//         <p><li> <b>Descripción:</b> ${productId.Descripcion}</li></p>
-//         <p><li> <b>Categoria:</b> ${productId.Categoria}</li></p>
-//         <p><li> <b>Talla:</b> ${productId.Talla}</li></p>
-//         <p><li> <b>Precio:</b> ${productId.Precio}</li></p>
-//         <li><b>Imagen:</b><img src="${productId.Imagen}"/></li>
-//         </ul>
-        
-//         </body>
-//         </html>`);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send({ message: "There was a problem trying to get the post" });
 //     }
 // }

@@ -9,8 +9,8 @@ const session = require("express-session")
 const methodOverride = require("method-override")
 const path = require('path');
 const hashedSecret = require("./config/crypto.js")
-
-
+const templatePath= __dirname.replace("app","template")
+// console.log(templatePath)
 app.use(session({
   secret:process.env.jwtPrivateKey,
   resave:false,
@@ -29,8 +29,12 @@ app.use(methodOverride('_method'));
 app.use("/", require("./routes/authRoutes.js"))
 
 app.use( express.static(path.join(__dirname, '..','public')))
-
-
+app.set("views",`${templatePath}`)
+app.set("view engine","pug")
+app.get("/",(req,res,next)=>{
+  res.render("index")
+  next()
+})
 dbConnection()
 
 app.listen(port, () => {

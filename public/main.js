@@ -15,3 +15,4 @@ onAuthStateChanged(auth,async(user)=>{
 
 
 })
+console.log("hola")

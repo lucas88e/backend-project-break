@@ -1,9 +1,9 @@
 const express = require("express")
 const router = express.Router();
-const { createProduct, deleteProduct,updateProduct,categorias} = require("../controllers/productController.js")
+const { createProduct, deleteProduct,updateProduct,categorias,dashboardProduct,productsId} = require("../controllers/productController.js")
 const multer = require("multer")
 const upload = multer({ dest: "public/images/" })
-const { showNewProducts,showEditProducts,dashboardProducts,showProducts,productsId,dashboard } = require("../controllers/esstructura.js")
+const { showNewProducts,showEditProducts,showProducts,dashboard } = require("../controllers/esstructura.js")
 const auth = require("../middelware/auth")
 const admin = require("../middelware/admin")
 const Product = require("../models/Product.js");
@@ -50,7 +50,7 @@ router.get("/dashboard", dashboard)
 //GET /dashboard/new: Devuelve el formulario para subir un artículo nuevo.
 router.get("/dashboard/new", showNewProducts)
 //GET /dashboard/:productId: Devue lve el detalle de un producto en el dashboard.
-router.get("/dashboard/:productId", dashboardProducts);
+router.get("/dashboard/:productId", dashboardProduct);
 
 //GET /dashboard/:productId/edit: Devuelve el formulario para editar un producto.
 
