@@ -42,6 +42,7 @@ router.post(
 	'/login',
 
 	async (req, res) => {
+		console.log(req.body)
 		const { username, password: passwordPlainText } = req.body
 
 		const user = await User.findOne({ username })
@@ -60,10 +61,13 @@ router.post(
 		req.session.token = token
 
 
+
 		// const token = await user.generateJWT()
 
+		res.setHeader('Access-Control-Expose-Headers', 'x-auth-token')
 		res.setHeader('x-auth-token', token)
-		res.send('Bravo')
+		console.log(token)
+		res.send({mensaje:"Bravo"})
 	}
 )
 router.get("/registro",register)
@@ -91,7 +95,8 @@ router.post(
 		const token = newUser.generateJWT()
         console.log(token)
 
-		res.setHeader('x-auth-token', token)
+				res.setHeader('Access-Control-Expose-Headers', 'x-auth-token')
+				res.setHeader('x-auth-token', token)
 
 		res.send("Registrado")
 	}

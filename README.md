@@ -23,9 +23,9 @@ dandole el valor true y seleccionando a la derecha la opcion "Boolean".
   npm start 
 ```
 
-5- Recuerda si quieres subir una imagen hay que cambiar el archivo y añadir .png en la carpeta "public/images"
+5- Recuerda si quieres subir una imagen que sea en archivo jpg o png y no superior a 10 mb
 
-5- Hemos utilizado estas dependencias:
+6- Hemos utilizado estas dependencias:
 
     "bcrypt": "^5.1.1", Para encriptar las contraseñas
     "bootstrap": "^5.3.3", Libreria para darle estilo 

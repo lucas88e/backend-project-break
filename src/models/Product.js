@@ -4,7 +4,7 @@ const ProductSchema = new mongoose.Schema({
    Nombre:{type:String,required:true},
    Descripcion: {type:String, required:true},
    Imagen: {type:String},
-   Categoria: {type: String, enum: ["camisetas","Zapatos","Pantalones","Accesorios"]},
+   Categoria: {type: String, enum: ["Camisetas","Zapatos","Pantalones","Accesorios"]},
    Talla:{type:String,enum:["XS","S","M","L","XL"]},
    Precio: {type:String,required:true} 
 })

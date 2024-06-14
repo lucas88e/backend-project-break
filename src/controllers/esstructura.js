@@ -1,33 +1,10 @@
 const Product = require("../models/Product.js")
-// function getNavBar() {
-//   const html = `<nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
-//   <div class="container-fluid">
-//     <a class="navbar-brand" href="/products">Productos</a>
-  
-//     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-//     <span class="navbar-toggler-icon"></span>
-//     </button>
-//     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-//     <div class="navbar-nav">
-//       <a class="nav-link active" aria-current="page" href="/productos/Camisetas">Camisetas</a>
-//       <a class="nav-link active" aria-current="page" href="/productos/Zapatos">Zapatos</a>
-//       <a class="nav-link active" aria-current="page" href="/productos/pantalones">Pantalones</a>
-//       <a class="nav-link active" aria-current="page" href="/productos/accesorios">Accesorios</a>
-//       <a class="nav-link active" aria-current="page" href="/dashboard/new">Nuevo Producto</a>
 
-//       <a class="nav-link active" aria-current="page" href="/sesion">Login</a>
-  
-//     </div>
-//     </div>
-//   </div>
-//   </nav>`
-//   return html
-// }
 function getNavBar() {
   const html = `
-    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+    <nav class="navbar navbar-lg bg-body-tertiary" data-bs-theme="dark">
         <div class="container">
-          <a class="navbar-brand" href="#">FireApp</a>
+          <a class="navbar-brand" href="#">Tu Tienda</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -77,10 +54,12 @@ function getNavBar() {
         <div class="modal-body">
             <form id="login-form">
             <label for="email">Email:</label>
-            <input type="email" class="form-control mb-3" id="login-email" placeholder="Email" required>
+            <input type="text" class="form-control mb-3" id="login-email" placeholder="Username" required>
             <label for="password">Password:</label>
             <input type="password" id="login-password" class="form-control mb-3" placeholder="******" required>
-            <button type="submit"  class="btn btn-primary">Login</button>
+            <button type="submit"  class="btn btn-primary" id="btn-login">Login</button>
+           <button type="submit"  class="btn btn-primary" id="btn-protected">protected</button>
+
             </form>
         </div>
         
@@ -99,7 +78,7 @@ function getNavBar() {
         <div class="modal-body">
             <form id="register-form">
                 <label for="email">Email:</label>
-                <input type="email" class="form-control mb-3" id="register-email" placeholder="Email" required>
+                <input type="text" class="form-control mb-3" id="register-email" placeholder="Email" required>
                 <label for="password">Password:</label>
                 <input type="password" class="form-control mb-3" id="register-password" placeholder="******" required>
                 <button type="submit" class="btn btn-primary">Register</button>
@@ -109,6 +88,42 @@ function getNavBar() {
       </div>
     </div>
   </div>
+
+   <script>
+    const loginForm =document.getElementById('login-form')
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const data = {
+            username: e.target[0].value,
+            password: e.target[1].value,
+        };
+
+        try {
+            const res = await fetch("/login", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                const token = res.headers.get('x-auth-token');
+                if (token) {
+                    localStorage.setItem('authToken', token);
+                }
+                console.log("Login Succesfully")
+              window.location.href = "/products"
+            } else {
+                throw new Error('Login failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>`
   return html
 }
@@ -123,8 +138,6 @@ const baseHtml = `<!DOCTYPE html>
 	rel = "stylesheet" 
 	href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="/styles.css"/>
-    <script src="../main.js" type="module"></script>
-
 </head>
 <body>
    
@@ -149,7 +162,7 @@ function getCreateForm() {
                     
                    <p> <label for="imagen">Imagen:</label>
                     <input type="file" id="imagen" name="imagen"></p>
-      F
+
                    <p><label for="Categoria">Categoria:</label>
                     <input type="text" id="Categoria" name="Categoria" required></p>
       
@@ -216,7 +229,7 @@ if(form){
             Precio: e.target[5].value
         }
     
-        fetch("http://localhost:3005/dashboard/${product._id}", {
+        fetch("/dashboard/${product._id}", {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -265,80 +278,7 @@ async function deleteProduct() {
     }
 }
 </script> */}
-function dashboardProduct(products) {
-  try {
-    let html = '';
-    for (let product of products) {
-      html += `
-      <h1>Sesion de administrador</h1>
-                <h2> ${product.Nombre} es el articulo seleccionado</h2>
-                <ul>
-                    <p><li> <b>Nombre:</b> ${product.Nombre}</li></p>
-                    <p><li> <b>Descripción:</b> ${product.Descripcion}</li></p>
-                    <p><li> <b>Id:</b> ${product._id}</li></p>
-                    <p><li> <b>Categoria:</b> ${product.Categoria}</li></p>
-                    <p><li> <b>Talla:</b> ${product.Talla}</li></p>
-                    <p><li> <b>Precio:</b> ${product.Precio}</li></p>
-                     <p><li> <b>Imagen:</b><img src="${product.Imagen}" class="card-img-top"/></li></p>
 
-
-                </ul>
-                <a href="/dashboard/${product._id}/edit" class="btn btn-primary">Modificar</a>
-                <button onClick="deleteProduct()" id="btnDelete" class="btn btn-danger">Eliminar</button>
-
-                <script>
-                    async function deleteProduct() {
-                        try {
-                            const response = await fetch('/dashboard/${product._id}/delete', {
-                                method: 'DELETE',
-                               
-                            });
-                            if (response.ok) {
-                                alert('Producto eliminado exitosamente');
-                                window.location.href = '/dashboard';
-                            } else {
-                                alert('Error al eliminar el producto');
-                            }
-                        } catch (error) {
-                            console.error('Error al eliminar el producto:', error);
-                            alert('Error al eliminar el producto');
-                        }
-                    }
-                </script>
-            `;                    
-      return html
-    }
-  }
-  catch (error) {
-    console.error(error);
-  }
-  ;
-}
-function productId(products) {
-  try {
-    let html = '';
-    for (let product of products) {
-      html +=
-        `
-          <h1>Sesion Iniciada</h1>
-        <h2> ${product.Nombre} es el articulo selecionado</h2>
-        <ul>
-        <p><li> <b>Nombre:</b> ${product.Nombre}</li></p>
-        <p><li> <b>Descripción:</b> ${product.Descripcion}</li></p>
-        <p><li> <b>Categoria:</b> ${product.Categoria}</li></p>
-        <p><li> <b>Talla:</b> ${product.Talla}</li></p>
-        <p><li> <b>Precio:</b> ${product.Precio}</li></p>
-        <li><b>Imagen:</b><img src="${product.Imagen}"/></li>
-        </ul>
-        
-        `;
-      return html
-    }
-  }
-  catch (error) {
-    console.error(error);
-  }
-}
 
 function dashboards(products) {
   try {

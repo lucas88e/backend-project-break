@@ -35,7 +35,9 @@ app.get("/",(req,res,next)=>{
   res.render("index")
   next()
 })
+app.use(require("./middelware/errors.js"))
 dbConnection()
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`)

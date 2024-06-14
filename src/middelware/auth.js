@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 module.exports = async function (req, res, next) {
-	const token = req.headers['x-auth-token']
+	const token = req.headers['x-auth-token']  || req.body.token;
 
 	if (!token)
 		return res

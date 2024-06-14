@@ -8,6 +8,7 @@ export const loginCheck = user =>{
     loggedOutLinks.forEach(link => link.style.display ="none")
     loggedInLinks.forEach(link => link.style.display ="block")
 
+
  }
  else{
     loggedOutLinks.forEach(link => link.style.display ="block")

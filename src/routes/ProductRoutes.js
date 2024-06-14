@@ -2,12 +2,32 @@ const express = require("express")
 const router = express.Router();
 const { createProduct, deleteProduct,updateProduct,categorias,dashboardProduct,productsId} = require("../controllers/productController.js")
 const multer = require("multer")
-const upload = multer({ dest: "public/images/" })
 const { showNewProducts,showEditProducts,showProducts,dashboard } = require("../controllers/esstructura.js")
 const auth = require("../middelware/auth")
 const admin = require("../middelware/admin")
 const Product = require("../models/Product.js");
 require('express-async-errors')
+const MIMETYPES = ['image/jpeg', 'image/png'];
+const {extname} = require("path")
+const upload = multer({     storage: multer.diskStorage({ 
+    destination: "public/images/",
+    filename:(req,file,cb)=>{
+        const fileExtension = extname(file.originalname);
+        const fileName = file.originalname.split(fileExtension)[0];
+
+        cb(null,`${fileName}${fileExtension}`)
+
+}
+}),
+  
+    fileFilter:(req,file,cb)=>{
+        if(MIMETYPES.includes(file.mimetype))cb(null,true)
+            else cb(new Error (`Only ${MIMETYPES.join('')}mimetypes are allowed`))
+    },
+    limits:{
+        fieldSize: 10000000
+    }
+ })
 
 
 // async function generateJWT() {

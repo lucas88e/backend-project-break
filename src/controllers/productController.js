@@ -3,12 +3,12 @@ const {getNavBar,baseHtml,endHtml} = require("./esstructura.js")
 
 
 const createProduct = async (req, res) => {
-    try {
+    
         if (!req.file) {
             return res.status(400).send("Imagen no proporcionada");
         }
 
-        const imagePath = `/images/${req.file.filename}.png`;
+        const imagePath = `/images/${req.file.filename}`;
         const productData = {
             ...req.body,
             Imagen: imagePath 
@@ -17,29 +17,22 @@ const createProduct = async (req, res) => {
         const createProduct = await Product.create(productData);
         res.status(201).send(createProduct);
         console.log(createProduct);
-    } catch (error) {
-        console.log(error);
-        res.status(500).send("No se pudo crear el Producto, revisa el modelo");
-    }
+   
 };
 
 
-const deleteProduct = async (req, res,next) => {
-    try {
+const deleteProduct = async (req, res,) => {
+    
         const id = req.params.productId
         const deleteProduct = await Product.findByIdAndDelete(id)
         if (!deleteProduct) {
             return res.json({ error: "Product  not found" })
         }
         res.status(200).send(`${deleteProduct} deleted successfully`);
-    } catch (error) {
-        // console.error(error);
-        // res.status(500).send({ message: "There was a problem trying to delete the post" });
-        next()
-    }
+  
 }
-const updateProduct = async (req, res,next) => {
-    try {
+const updateProduct = async (req, res,) => {
+   
         const id = req.params.productId
         const updateProduct = await Product.findByIdAndUpdate(id, req.body,
             { new: true }
@@ -49,12 +42,8 @@ const updateProduct = async (req, res,next) => {
         }
         console.log(updateProduct)
         res.status(200).send(`${updateProduct} update successfully`);
-    } catch (error) {
-        next();
-    }
+  
 }
-
-
 
 const register = async (req, res) => {
 
@@ -92,7 +81,7 @@ const categorias = async (req,res)=>{
 
 
 const productsId = async (req, res) => {
-    try {
+   
         const productId = await Product.findById(req.params.productId);
         if (!productId) {
             return res.status(404).send({ message: "Product not found" });
@@ -110,13 +99,10 @@ const productsId = async (req, res) => {
         </ul>
         
        ${endHtml}`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: "There was a problem trying to get the post" });
-    }
+    
 }
 const dashboardProduct = async (req, res) => {
-    try {
+   
         const productId = await Product.findById(req.params.productId);
         if (!productId) {
             return res.status(404).send({ message: "Product not found" });
@@ -159,10 +145,7 @@ const dashboardProduct = async (req, res) => {
 
             console.log(productId.Imagen)
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: "There was a problem trying to get the product" });
-    }
+   
 }
 
 
