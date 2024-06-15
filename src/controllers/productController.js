@@ -66,15 +66,14 @@ const categorias = async (req,res)=>{
 
 	res.status(201).send(`${baseHtml}
     ${getNavBar()}
-                 ${todasCategorias.map((el) => `<h1>Lista de productos</h1>
-                    <ul><li>${el.Nombre}
-                </li>
-                 <li>${el.Descripcion}</li>
-                 <li>${el.Categoria}</li>
-                 <li>${el.Talla}</li>
-                 <li>${el.Precio}</li>
-                <li><img src="${el.Imagen}"/></li>
-               </ul>`)}
+                 ${todasCategorias.map((el) =>  `<div class="card" style="width: 20rem;">
+                    <img src="${el.Imagen}"class="card-img-top" alt="${el.Nombre}"/>
+                    <div class="card-body">
+                      <h2 class="card-title">${el.Nombre}</h2>
+                      <p class="card-text">${el.Descripcion}</p>
+                   
+                    </div>
+                  </div>`)}
             ${endHtml}`)
 
 }
@@ -87,16 +86,21 @@ const productsId = async (req, res) => {
             return res.status(404).send({ message: "Product not found" });
         }
         res.status(200).send(`${baseHtml}${getNavBar()}
-          <h1>Sesion Iniciada</h1>
-        <h2> ${productId.Nombre} es el articulo selecionado</h2>
-        <ul>
-        <p><li> <b>Nombre:</b> ${productId.Nombre}</li></p>
-        <p><li> <b>Descripción:</b> ${productId.Descripcion}</li></p>
-        <p><li> <b>Categoria:</b> ${productId.Categoria}</li></p>
-        <p><li> <b>Talla:</b> ${productId.Talla}</li></p>
-        <p><li> <b>Precio:</b> ${productId.Precio}</li></p>
-        <li><b>Imagen:</b><img src="${productId.Imagen}"/></li>
-        </ul>
+        <div class="card" style="width: 20rem;">
+      <img src="${productId.Imagen}"class="card-img-top" alt="${productId.Nombre}"/>
+      <div class="card-body">
+        <h2 class="card-title">${productId.Nombre}</h2>
+        <p class="card-text"> <b>Descripcion:</b> ${productId.Descripcion}</p>
+        <p class="card-text"><b>Categoria:</b>${productId.Categoria}</p>
+
+        <p class="card-text"><b>Talla:</b>${productId.Talla}</p>
+        <p class="card-text"><b>Precio:</b>${productId.Precio}</p>
+
+
+
+        
+      </div>
+    </div>
         
        ${endHtml}`);
     

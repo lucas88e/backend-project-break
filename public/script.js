@@ -120,3 +120,24 @@ if (res.ok) {
 console.error('Error:', error);
 }
 })
+
+
+
+const token = localStorage.getItem('authToken');
+fetch('/dashboard', {
+    method: 'GET',
+    headers: {
+        'x-auth-token': token,
+        'Content-Type': 'application/json',
+    }
+}).then(response => {
+    if (response.ok) {
+        return response.json();
+    } else {
+        throw new Error('Acceso denegado');
+    }
+}).then(data => {
+    console.log('Datos protegidos:', data);
+}).catch(error => {
+    console.error('Error:', error);
+});

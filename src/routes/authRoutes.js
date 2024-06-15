@@ -38,38 +38,31 @@ router.get("/sesion", (req, res) => {
 res.send(login)}
 })
 
-router.post(
-	'/login',
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
 
-	async (req, res) => {
-		console.log(req.body)
-		const { username, password: passwordPlainText } = req.body
+    try {
+        const user = await User.findOne({ username });
 
-		const user = await User.findOne({ username })
+        if (!user) {
+            return res.status(400).send('Usuario o contraseña inválidos.');
+        }
 
-		if (!user)
-			return res.status(400).send('Usuario o contraseña invalido')
+        const isAuth = await bcrypt.compare(password, user.password);
 
-		const isAuth = await bcrypt.compare(
-			passwordPlainText,
-			user.password
-		)
+        if (!isAuth) {
+            return res.status(400).send('Usuario o contraseña inválidos.');
+        }
 
-		if (!isAuth)
-			return res.status(400).send('Usuario o contraseña invalido')
-        const token = user.generateJWT()
-		req.session.token = token
-
-
-
-		// const token = await user.generateJWT()
-
-		res.setHeader('Access-Control-Expose-Headers', 'x-auth-token')
-		res.setHeader('x-auth-token', token)
-		console.log(token)
-		res.send({mensaje:"Bravo"})
-	}
-)
+        const token = jwt.sign({ _id: user._id }, process.env.jwtPrivateKey);
+        res.setHeader('Access-Control-Expose-Headers', 'x-auth-token');
+        res.setHeader('x-auth-token', token);
+        res.status(200).json({ message: 'Login exitoso', token });
+    } catch (error) {
+        console.error('Error en el login:', error);
+        res.status(500).send('Error interno en el servidor.');
+    }
+});
 router.get("/registro",register)
            
 router.post(

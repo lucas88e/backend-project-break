@@ -90,40 +90,52 @@ function getNavBar() {
   </div>
 
    <script>
-    const loginForm =document.getElementById('login-form')
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+// JavaScript en el cliente (navegador)
+const loginForm = document.getElementById('login-form');
+const logoutButton = document.getElementById('logout');
 
-        const data = {
-            username: e.target[0].value,
-            password: e.target[1].value,
-        };
+// LOGIN
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        try {
-            const res = await fetch("/login", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
+    const data = {
+        username: e.target[0].value,
+        password: e.target[1].value,
+    };
 
-            if (res.ok) {
-                const token = res.headers.get('x-auth-token');
-                if (token) {
-                    localStorage.setItem('authToken', token);
-                }
-                console.log("Login Succesfully")
-              window.location.href = "/products"
-            } else {
-                throw new Error('Login failed');
+    try {
+        const res = await fetch("/login", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            const token = res.headers.get('x-auth-token');
+            if (token) {
+               
+                localStorage.setItem('authToken', token);
             }
-        } catch (error) {
-            console.error('Error:', error);
+            console.log("Login exitoso");
+            window.location.href = "/products";
+            throw new Error('Login fallido');
         }
-    });
-    </script>
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
 
+// LOGOUT
+  logoutButton.addEventListener('click', () => {
+    // Remover el token del almacenamiento local (localStorage)
+    localStorage.removeItem('authToken');
+    window.location.href = '/products'; // Redirigir a la página de productos u otra página
+});
+
+
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>`
   return html
 }
@@ -259,25 +271,6 @@ if(form){
   ;
 }
 
-{/* <script>
-async function deleteProduct() {
-    try {
-        const response = await fetch('/dashboard/${product._id}/delete', {
-            method: 'DELETE',
-           
-        });
-        if (response.ok) {
-            alert('Producto eliminado exitosamente');
-            window.location.href = '/dashboard';
-        } else {
-            alert('Error al eliminar el producto');
-        }
-    } catch (error) {
-        console.error('Error al eliminar el producto:', error);
-        alert('Error al eliminar el producto');
-    }
-}
-</script> */}
 
 
 function dashboards(products) {
@@ -285,17 +278,16 @@ function dashboards(products) {
     let html = '';
     for (let product of products) {
       html +=
-        `<h1>Lista de productos</h1>
-         <ul><li>${product.Nombre}
-        </li>
-        <li>${product.Descripcion}</li>
-        <li>${product.Categoria}</li>
-        <li>${product.Talla}</li>
-        <li>${product.Precio}</li>
-        <li><img src="${product.Imagen}"/></li>
-        <a href ="/dashboard/${product._id}"> Gestionar como administrador</a>
-
-       </ul>`;
+      ` 
+      <div class="card" style="width: 20rem;">
+      <img src="${product.Imagen}"class="card-img-top" alt="${product.Nombre}"/>
+      <div class="card-body">
+        <h5 class="card-title">${product.Nombre}</h5>
+        <p class="card-text">${product.Descripcion}</p>
+        <a href ="/dashboard/${product._id}" class="btn btn-primary">Gestionar como administrador</a>
+      </div>
+    </div>
+    `;
  
     }     return html
   }
@@ -347,14 +339,7 @@ const showEditProducts = async (req, res) => {
   const html = baseHtml + getNavBar() + productCards+endHtml;
   res.send(html);
 };
-// const dashboardProducts = async (req, res) => {
-//   const products = await Product.find();
-//   const productCards = dashboardProduct(products);
-//   const html = baseHtml + getNavBar() + productCards+endHtml;
-//   res.send(html);
-// };
 
-// 
 const dashboard = async (req, res) => {
   const products = await Product.find();
   const productCards = dashboards(products);

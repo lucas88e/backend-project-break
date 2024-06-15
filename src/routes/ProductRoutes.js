@@ -65,10 +65,13 @@ router.delete("/dashboard/:productId/delete", deleteProduct)
 // Si clickamos en uno de ellos nos llevará a su página para poder actualizarlo o eliminarlo.
 
 
-router.get("/dashboard", dashboard)
+router.get("/dashboard" , dashboard)
+// router.get("/dashboard" ,auth, dashboard)
 
 //GET /dashboard/new: Devuelve el formulario para subir un artículo nuevo.
 router.get("/dashboard/new", showNewProducts)
+// router.get("/dashboard/new", [auth,admin],showNewProducts)
+
 //GET /dashboard/:productId: Devue lve el detalle de un producto en el dashboard.
 router.get("/dashboard/:productId", dashboardProduct);
 

@@ -25,7 +25,9 @@ dandole el valor true y seleccionando a la derecha la opcion "Boolean".
 
 5- Recuerda si quieres subir una imagen que sea en archivo jpg o png y no superior a 10 mb
 
-6- Hemos utilizado estas dependencias:
+6- No he conseguido añadir los permmisos para los usuarios o administradores en el servidor, pero sin en el Thunder habria que añadirle solo e [auth , admin] en las rutas correspondientes.
+
+7- Hemos utilizado estas dependencias:
 
     "bcrypt": "^5.1.1", Para encriptar las contraseñas
     "bootstrap": "^5.3.3", Libreria para darle estilo 

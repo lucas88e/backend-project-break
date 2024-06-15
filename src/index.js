@@ -10,6 +10,8 @@ const methodOverride = require("method-override")
 const path = require('path');
 const hashedSecret = require("./config/crypto.js")
 const templatePath= __dirname.replace("app","template")
+const cors = require('cors');
+
 // console.log(templatePath)
 app.use(session({
   secret:process.env.jwtPrivateKey,
@@ -27,7 +29,11 @@ app.use(helmet())
 app.use(compression())
 app.use(methodOverride('_method'));
 app.use("/", require("./routes/authRoutes.js"))
-
+app.use(cors({
+  origin: 'http://localhost:3005', // Cambia esto al dominio correcto de tu aplicación cliente
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type, x-auth-token'
+}));
 app.use( express.static(path.join(__dirname, '..','public')))
 app.set("views",`${templatePath}`)
 app.set("view engine","pug")
